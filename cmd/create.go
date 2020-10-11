@@ -62,6 +62,8 @@ var createCmd = &cobra.Command{
 		if err != nil {
 			utils.Err("fatal", err.Error())
 		}
+
+		utils.Info("sill", fmt.Sprintf("Created katamari project %s", chalk.Green.Color(args[0])))
 	},
 }
 
