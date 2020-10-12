@@ -1,26 +1,28 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2020 DSCVIT
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    http://www.apache.org/licenses/LICENSE-2.0
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/cobra"
+
 	"github.com/spf13/viper"
 )
 
@@ -28,9 +30,9 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "katamari <command> <subcommand> [flags]",
-	Short: "katamari CLI",
-	Long:  `Use katamari to aggregate and build static pages for all the READMEs in your organization`,
+	Use:           "katamari <command> <subcommand> [flags]",
+	Short:         "katamari CLI",
+	Long:          `Use katamari to aggregate and build static pages for all the READMEs in your organization`,
 	SilenceErrors: true,
 }
 
@@ -50,24 +52,25 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.katamari.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $PWD/.katamari.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	fmt.Println(cfgFile)
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-	} else {
+	} else {	
 		// Find home directory.
-		home, err := homedir.Dir()
+		cwd, err := os.Getwd()
 		if err != nil {
-			fmt.Println(err)
+			utils.Err("enoent", err.Error())
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".katamari" (without extension).
-		viper.AddConfigPath(home)
+		// Search config in cwd directory with name ".katamari" (without extension).
+		viper.AddConfigPath(cwd)
 		viper.SetConfigName(".katamari")
 	}
 
@@ -75,6 +78,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		utils.Info("sill", fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
 }
