@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
 	"os"
 	"os/exec"
 
@@ -35,26 +36,28 @@ var createCmd = &cobra.Command{
 	Example: katamari create gdgvit`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) > 1 {
-			msg := fmt.Sprintf("Ignoring extra arguments after %s", chalk.Green.Color("'" + args[0] + "'"))
+			msg := fmt.Sprintf("Ignoring extra arguments after %s", chalk.Green.Color("'"+args[0]+"'"))
 			utils.Warn("optional", msg)
 		} else if len(args) == 0 {
-			cmd.Help()
+			_ = cmd.Help()
 			os.Exit(0)
 		}
 
 		utils.Info("sill", "Initializing a new katamari project...")
+		viper.Set("site", args[0])
+		viper.Set("theme", "ananke")
 
 		hugoPath, err := exec.LookPath("hugo")
 		if err != nil {
 			utils.Err("notsup", "could not find hugo! make sure you have hugo installed.")
 			os.Exit(1)
 		}
-		
-		hugo := exec.Cmd {
-			Path: hugoPath,
+
+		hugo := exec.Cmd{
+			Path:   hugoPath,
 			Stdout: nil,
 			Stderr: os.Stderr,
-			Args: []string{"", "new", "site", args[0]},
+			Args:   []string{"", "new", "site", args[0]},
 		}
 
 		utils.Info("run", hugo.String())
@@ -62,8 +65,22 @@ var createCmd = &cobra.Command{
 		err = hugo.Run()
 		if err != nil {
 			utils.Err("fatal", err.Error())
+			os.Exit(1)
 		}
 
+		err = os.Chdir(fmt.Sprintf("./%s", args[0]))
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		err = viper.SafeWriteConfigAs(".katamari.toml")
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		utils.Info("config", "Generated katamari config file in project directory")
 		utils.Info("sill", fmt.Sprintf("Created katamari project %s", chalk.Green.Color(args[0])))
 	},
 }
