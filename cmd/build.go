@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
 	"os"
 	"sync"
 	"time"
@@ -35,20 +36,28 @@ var buildCmd = &cobra.Command{
 	Short: "Build your katamari project",
 	Long:  `Fetch all repos from the specified organization, clone the READMEs and generate static pages ready for hosting!`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			msg := fmt.Sprintf("Ignoring extra arguments after %s", chalk.Green.Color(fmt.Sprintf("'%s'", args[0])))
-			utils.Warn("optional", msg)
-		} else if len(args) == 0 {
-			cmd.Help()
-			os.Exit(0)
+		if len(args) > 0 {
+			utils.Warn("optional", "Ignoring extra arguments")
 		}
 
-		utils.Info("sill", fmt.Sprintf("fetching repos for %s", chalk.Green.Color(fmt.Sprintf("'%s'", args[0]))))
+		org := viper.GetString("site")
 
-		os.MkdirAll("./content/readmes/", 0755)
+		if org == "" {
+			utils.Err("config", fmt.Sprintf("configuration not found! make sure you have a %s file in the "+
+				"project dir.", chalk.Green.Color(".katamari.toml")))
+			os.Exit(1)
+		}
+
+		utils.Info("sill", fmt.Sprintf("fetching repos for %s", chalk.Green.Color(fmt.Sprintf("'%s'", org))))
+
+		err := os.MkdirAll("./content/readmes/", 0755)
+		if err != nil {
+			utils.Err("enoent", err.Error())
+		}
 
 		client := github.NewClient(nil)
-		repos, _, err := client.Repositories.ListByOrg(context.Background(), args[0], &github.RepositoryListByOrgOptions{Type: "public"})
+		repos, _, err := client.Repositories.ListByOrg(context.Background(), org,
+			&github.RepositoryListByOrgOptions{Type: "public"})
 		if err != nil {
 			utils.Err("enoent", err.Error())
 			os.Exit(1)
@@ -61,7 +70,7 @@ var buildCmd = &cobra.Command{
 			utils.Info("sill", fmt.Sprintf("Fetching readme for repo %s", *repo.Name))
 			go func(client *github.Client, repo *github.Repository, wg *sync.WaitGroup) {
 				defer wg.Done()
-				readme, _, err := client.Repositories.GetReadme(context.Background(), args[0], *repo.Name, nil)
+				readme, _, err := client.Repositories.GetReadme(context.Background(), org, *repo.Name, nil)
 				if err != nil {
 					utils.Err("enoent", err.Error())
 					return
@@ -76,18 +85,21 @@ var buildCmd = &cobra.Command{
 				f, err := os.Create(fmt.Sprintf("./content/readmes/%s.md", *repo.Name))
 				if err != nil {
 					utils.Err("enoent", err.Error())
+					return
 				}
 
-				f.WriteString("---\n")
-				f.WriteString(fmt.Sprintf("title: %s\n", *repo.Name))
-				f.WriteString(fmt.Sprintf("date: %s\n", time.Now().UTC().Format("2006-01-02T15:04:05-0700")))
-				f.WriteString(fmt.Sprintf("draft: false\n"))
-				f.WriteString("---\n")
-				f.WriteString(content)
+				_, _ = f.WriteString("---\n")
+				_, _ = f.WriteString(fmt.Sprintf("title: %s\n", *repo.Name))
+				_, _ = f.WriteString(fmt.Sprintf("date: %s\n", time.Now().UTC().Format("2006-01-02T15:04:05-0700")))
+				_, _ = f.WriteString(fmt.Sprintf("draft: false\n"))
+				_, _ = f.WriteString("---\n")
+				_, _ = f.WriteString(content)
 			}(client, repo, &wg)
 		}
 
 		wg.Wait()
+		utils.Info("sill", fmt.Sprintf("Successfully built your katamari project. %s", chalk.Green.Color("Don't forget to install a hugo theme!")))
+		utils.Info("sill", fmt.Sprintf("Run %s %s", chalk.Green.Color("hugo server"), chalk.White.Color("to run the hugo server")))
 	},
 }
 
