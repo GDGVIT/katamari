@@ -1,4 +1,4 @@
-module katamari
+module github.com/GDGVIT/katamari
 
 go 1.15
 

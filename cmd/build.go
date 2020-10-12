@@ -19,7 +19,7 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"katamari/internal/utils"
+	"github.com/GDGVIT/katamari/internal/utils"
 	"os"
 	"sync"
 	"time"

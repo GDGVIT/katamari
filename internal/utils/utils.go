@@ -18,7 +18,7 @@ package utils
 
 import (
 	"fmt"
-	"katamari/internal/styles"
+	"github.com/GDGVIT/katamari/internal/styles"
 
 	"github.com/ttacon/chalk"
 )

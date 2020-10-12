@@ -18,7 +18,7 @@ package cmd
 
 import (
 	"fmt"
-	"katamari/internal/utils"
+	"github.com/GDGVIT/katamari/internal/utils"
 	"os"
 	"os/exec"
 
