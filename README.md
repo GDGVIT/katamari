@@ -13,6 +13,7 @@
 # Functionality
 - [x] Aggregate all your project READMEs into a single static site
 - [x] Generate the static site using Hugo
+- [x] Available on the AUR
 - [ ] Set Hugo configuration without having to edit the file
 - [ ] Set the Hugo theme with a single command
 <br>
@@ -20,6 +21,9 @@
 
 # Getting started
 Follow the instructions to get started and run this project.
+
+## Arch Linux
+This package is available as an [AUR](https://aur.archlinux.org/packages/katamari/).
 
 ## Dependencies
 -  [Go](https://golang.org/doc/install)
@@ -50,7 +54,7 @@ katamari build
 
 <td>
 
-John Doe
+Amogh Lele
 
 <p align="center">
 <img src = "https://avatars3.githubusercontent.com/u/31761843" width="150" height="150" alt="Amogh Lele">
