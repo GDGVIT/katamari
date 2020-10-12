@@ -35,11 +35,8 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Build your katamari project",
 	Long:  `Fetch all repos from the specified organization, clone the READMEs and generate static pages ready for hosting!`,
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 0 {
-			utils.Warn("optional", "Ignoring extra arguments")
-		}
-
 		org := viper.GetString("site")
 
 		if org == "" {

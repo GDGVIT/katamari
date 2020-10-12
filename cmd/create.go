@@ -29,20 +29,13 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create",
+	Use:   "create [organization name]",
 	Short: "Create a new katamari project",
 	Long: `Use this command to create a new project using katamari.
 	
 	Example: katamari create gdgvit`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 1 {
-			msg := fmt.Sprintf("Ignoring extra arguments after %s", chalk.Green.Color("'"+args[0]+"'"))
-			utils.Warn("optional", msg)
-		} else if len(args) == 0 {
-			_ = cmd.Help()
-			os.Exit(0)
-		}
-
 		utils.Info("sill", "Initializing a new katamari project...")
 		viper.Set("site", args[0])
 		viper.Set("theme", "ananke")
