@@ -18,10 +18,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/cobra"
+
 	"github.com/spf13/viper"
 )
 
@@ -29,9 +30,9 @@ var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "katamari <command> <subcommand> [flags]",
-	Short: "katamari CLI",
-	Long:  `Use katamari to aggregate and build static pages for all the READMEs in your organization`,
+	Use:           "katamari <command> <subcommand> [flags]",
+	Short:         "katamari CLI",
+	Long:          `Use katamari to aggregate and build static pages for all the READMEs in your organization`,
 	SilenceErrors: true,
 }
 
@@ -51,24 +52,25 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.katamari.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $PWD/.katamari.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	fmt.Println(cfgFile)
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-	} else {
+	} else {	
 		// Find home directory.
-		home, err := homedir.Dir()
+		cwd, err := os.Getwd()
 		if err != nil {
-			fmt.Println(err)
+			utils.Err("enoent", err.Error())
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".katamari" (without extension).
-		viper.AddConfigPath(home)
+		// Search config in cwd directory with name ".katamari" (without extension).
+		viper.AddConfigPath(cwd)
 		viper.SetConfigName(".katamari")
 	}
 
@@ -76,6 +78,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+		utils.Info("sill", fmt.Sprintf("Using config file: %s", viper.ConfigFileUsed()))
 	}
 }
