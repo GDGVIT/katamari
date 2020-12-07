@@ -54,10 +54,6 @@ var createCmd = &cobra.Command{
 			Args:   []string{"", "new", "site", args[0]},
 		}
 
-		// theme := exec.Cmd{
-
-		// }
-
 		utils.Info("run", hugo.String())
 
 		err = hugo.Run()
@@ -72,6 +68,51 @@ var createCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		gitPath, err := exec.LookPath("git")
+		if err != nil {
+			utils.Err("notsup", "could not find git! make sure you have git installed, to install a theme.")
+			os.Exit(1)
+		}
+
+		init := exec.Cmd{
+			Path:   gitPath,
+			Stdout: nil,
+			Stderr: os.Stderr,
+			Args:   []string{"", "init"},
+		}
+
+		err = init.Run()
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		addTheme := exec.Cmd{
+			Path:   gitPath,
+			Stdout: nil,
+			Stderr: os.Stderr,
+			Args:   []string{"", "submodule", "add", "https://github.com/budparr/gohugo-theme-ananke.git", "themes/ananke"},
+		}
+
+		err = addTheme.Run()
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		f, err := os.OpenFile("config.toml", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			utils.Err("fatal", "unable to open config.toml")
+			os.Exit(1)
+		}
+
+		defer f.Close()
+
+		if _, err := f.WriteString(`theme="ananke"`); err != nil {
+			utils.Err("fatal", "unable to write to config.toml")
+			os.Exit(1)
+		}
+
 		err = viper.SafeWriteConfigAs(".katamari.toml")
 		if err != nil {
 			utils.Err("fatal", err.Error())
@@ -80,6 +121,7 @@ var createCmd = &cobra.Command{
 
 		utils.Info("config", "Generated katamari config file in project directory")
 		utils.Info("sill", fmt.Sprintf("Created katamari project %s", chalk.Green.Color(args[0])))
+		utils.Info("next", fmt.Sprintf("Update hugo config in %s", chalk.Green.Color(args[0]+"/config.toml")))
 	},
 }
 
