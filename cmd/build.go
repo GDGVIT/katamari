@@ -71,8 +71,25 @@ var buildCmd = &cobra.Command{
 			client = github.NewClient(nil)
 		}
 
-		repos, _, err := client.Repositories.ListByOrg(context.Background(), org,
-			&github.RepositoryListByOrgOptions{Type: "public"})
+		opt := &github.RepositoryListByOrgOptions{
+			Type:        "public",
+			ListOptions: github.ListOptions{PerPage: 50},
+		}
+
+		var allRepos []*github.Repository
+
+		for {
+			repos, resp, err := client.Repositories.ListByOrg(ctx, org, opt)
+			if err != nil {
+				utils.Err("enoent", err.Error())
+			}
+			allRepos = append(allRepos, repos...)
+			if resp.NextPage == 0 {
+				break
+			}
+			opt.Page = resp.NextPage
+		}
+
 		if err != nil {
 			utils.Err("enoent", err.Error())
 			os.Exit(1)
@@ -80,7 +97,7 @@ var buildCmd = &cobra.Command{
 
 		var wg sync.WaitGroup
 
-		for _, repo := range repos {
+		for _, repo := range allRepos {
 			wg.Add(1)
 			utils.Info("sill", fmt.Sprintf("Fetching readme for repo %s", *repo.Name))
 			go func(client *github.Client, repo *github.Repository, wg *sync.WaitGroup) {
@@ -111,8 +128,8 @@ var buildCmd = &cobra.Command{
 				_, _ = f.WriteString(content)
 			}(client, repo, &wg)
 		}
-
 		wg.Wait()
+		utils.Info("sill", fmt.Sprintf("Fetched %d repos", len(allRepos)))
 		utils.Info("sill", fmt.Sprintf("Successfully built your katamari project. %s", chalk.Green.Color("Don't forget to install a hugo theme!")))
 		utils.Info("sill", fmt.Sprintf("Run %s %s", chalk.Green.Color("hugo server"), chalk.White.Color("to run the hugo server")))
 	},

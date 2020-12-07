@@ -18,10 +18,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/GDGVIT/katamari/internal/utils"
-	"github.com/spf13/viper"
 	"os"
 	"os/exec"
+
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
@@ -52,6 +53,10 @@ var createCmd = &cobra.Command{
 			Stderr: os.Stderr,
 			Args:   []string{"", "new", "site", args[0]},
 		}
+
+		// theme := exec.Cmd{
+
+		// }
 
 		utils.Info("run", hugo.String())
 
