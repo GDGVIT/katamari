@@ -19,11 +19,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/GDGVIT/katamari/internal/utils"
-	"github.com/spf13/viper"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
+	"golang.org/x/oauth2"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/spf13/cobra"
@@ -35,7 +37,7 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Build your katamari project",
 	Long:  `Fetch all repos from the specified organization, clone the READMEs and generate static pages ready for hosting!`,
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		org := viper.GetString("site")
 
@@ -52,7 +54,23 @@ var buildCmd = &cobra.Command{
 			utils.Err("enoent", err.Error())
 		}
 
-		client := github.NewClient(nil)
+		ctx := context.Background()
+
+		token := os.Getenv("GITHUB_ACCESS_TOKEN")
+
+		var client *github.Client
+
+		if token != "" {
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: token},
+			)
+			tc := oauth2.NewClient(ctx, ts)
+			client = github.NewClient(tc)
+		} else {
+			utils.Warn("Access Token Missing", "Set an access token in a .katamari/config.json, else you might be rate limited by GitHub")
+			client = github.NewClient(nil)
+		}
+
 		repos, _, err := client.Repositories.ListByOrg(context.Background(), org,
 			&github.RepositoryListByOrgOptions{Type: "public"})
 		if err != nil {

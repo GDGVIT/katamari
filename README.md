@@ -46,7 +46,12 @@ cd <github organization name>
 katamari build
 ```
 
-## Contributors
+## Fix rate limiting
+
+Wherever you install katamari, it creates a `config.json` file in `.katamari` folder in the same directory as the executable. You need to add your GitHub Personal Access Token there in case you're being rate limited. If you require help in creating a Personal Access Token visit [this link](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token).
+
+
+# Contributors
 
 <table>
 <tr align="center">

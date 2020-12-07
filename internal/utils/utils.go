@@ -18,8 +18,12 @@ package utils
 
 import (
 	"fmt"
-	"github.com/GDGVIT/katamari/internal/styles"
+	"io/ioutil"
+	"log"
+	"os"
 
+	"github.com/GDGVIT/katamari/internal/styles"
+	"github.com/kardianos/osext"
 	"github.com/ttacon/chalk"
 )
 
@@ -36,4 +40,35 @@ func Info(t string, b string) {
 // Err prints a formatted and colored ERROR message
 func Err(t string, b string) {
 	fmt.Println(chalk.White.Color("katamari"), styles.ErrorStyle.Style("ERROR"), chalk.Magenta.Color(t), chalk.White.Color(b))
+}
+
+//ExecLoc to get the install loc of binary
+func ExecLoc() string {
+	folderPath, err := osext.ExecutableFolder()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return folderPath
+}
+
+//CheckConfig to check if config file exists
+func CheckConfig() {
+	folderPath := ExecLoc()
+	_, err := ioutil.ReadFile(folderPath + "/.katamari/config.json")
+	if err != nil {
+		generateConfig()
+	}
+}
+
+//generateConfig to generate an empty config file
+func generateConfig() {
+	credString := `
+	{
+		"GITHUB_ACCESS_TOKEN":""
+	}
+	`
+	mode := int(0666)
+	folderPath := ExecLoc()
+	os.Mkdir(".katamari", os.FileMode(0777))
+	ioutil.WriteFile(folderPath+"/.katamari/config.json", []byte(credString), os.FileMode(mode))
 }
