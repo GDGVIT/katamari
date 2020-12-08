@@ -91,7 +91,7 @@ var createCmd = &cobra.Command{
 			Path:   gitPath,
 			Stdout: nil,
 			Stderr: os.Stderr,
-			Args:   []string{"", "submodule", "add", "https://github.com/budparr/gohugo-theme-ananke.git", "themes/ananke"},
+			Args:   []string{"", "submodule", "add", "https://github.com/colorchestra/smol", "themes/smol"},
 		}
 
 		err = addTheme.Run()
@@ -108,7 +108,7 @@ var createCmd = &cobra.Command{
 
 		defer f.Close()
 
-		if _, err := f.WriteString(`theme="ananke"`); err != nil {
+		if _, err := f.WriteString(`theme="smol"`); err != nil {
 			utils.Err("fatal", "unable to write to config.toml")
 			os.Exit(1)
 		}
