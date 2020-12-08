@@ -69,6 +69,9 @@ func generateConfig() {
 	`
 	mode := int(0666)
 	folderPath := ExecLoc()
-	os.Mkdir(".katamari", os.FileMode(0777))
+	err := os.Mkdir(folderPath+"/.katamari", 0700)
+	if err != nil {
+		Err("fatal", "unable to create folder: "+err.Error())
+	}
 	ioutil.WriteFile(folderPath+"/.katamari/config.json", []byte(credString), os.FileMode(mode))
 }
