@@ -67,7 +67,7 @@ var buildCmd = &cobra.Command{
 			tc := oauth2.NewClient(ctx, ts)
 			client = github.NewClient(tc)
 		} else {
-			utils.Warn("Access Token Missing", "Set an access token in a .katamari/config.json, else you might be rate limited by GitHub")
+			utils.Warn("Access Token Missing", "Set an access token in a .katamari/config.json, else you might be rate limited by GitHub [refer README]")
 			client = github.NewClient(nil)
 		}
 
@@ -129,8 +129,9 @@ var buildCmd = &cobra.Command{
 			}(client, repo, &wg)
 		}
 		wg.Wait()
+
 		utils.Info("sill", fmt.Sprintf("Fetched %d repos", len(allRepos)))
-		utils.Info("sill", fmt.Sprintf("Successfully built your katamari project. %s", chalk.Green.Color("Don't forget to install a hugo theme!")))
+		utils.Info("sill", chalk.Green.Color("Successfully built your katamari project!"))
 		utils.Info("sill", fmt.Sprintf("Run %s %s", chalk.Green.Color("hugo server"), chalk.White.Color("to run the hugo server")))
 	},
 }

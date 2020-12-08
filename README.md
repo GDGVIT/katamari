@@ -13,9 +13,10 @@
 # Functionality
 - [x] Aggregate all your project READMEs into a single static site
 - [x] Generate the static site using Hugo
+- [x] Default theme set to "Ananke" (needs git)
+- [x] Store GitHub Access Token in config
 - [x] Available on the AUR
-- [ ] Set Hugo configuration without having to edit the file
-- [ ] Set the Hugo theme with a single command
+- [ ] Set Hugo configuration without having to edit `config.toml`
 <br>
 
 
@@ -48,7 +49,7 @@ katamari build
 
 ## Fix rate limiting
 
-Wherever you install katamari, it creates a `config.json` file in `.katamari` folder in the same directory as the executable. You need to add your GitHub Personal Access Token there in case you're being rate limited. If you require help in creating a Personal Access Token visit [this link](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token).
+Wherever you install katamari, it creates a `config.json` file in `.katamari` folder in the same directory as the executable. You need to add your GitHub Personal Access Token in `.katamari/config.json` in case you're being rate limited. If you require help in creating a Personal Access Token visit [this link](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token).
 
 
 # Contributors
@@ -65,8 +66,23 @@ Amogh Lele
 <img src = "https://avatars3.githubusercontent.com/u/31761843" width="150" height="150" alt="Amogh Lele">
 </p>
 <p align="center">
-<a href = "https://github.com/person1"><img src = "http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="36" height = "36" alt="GitHub"/></a>
+<a href = "https://github.com/sphericalkat"><img src = "http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="36" height = "36" alt="GitHub"/></a>
 <a href = "https://www.linkedin.com/in/person1">
+<img src = "http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="36" height="36" alt="LinkedIn"/>
+</a>
+</p>
+</td>
+
+<td>
+
+Siddhartha Varma
+
+<p align="center">
+<img src = "https://avatars0.githubusercontent.com/u/39856034" width="150" height="150" alt="Amogh Lele">
+</p>
+<p align="center">
+<a href = "https://github.com/BRO3886"><img src = "http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="36" height = "36" alt="GitHub"/></a>
+<a href = "https://www.linkedin.com/in/siddharthav22/">
 <img src = "http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="36" height="36" alt="LinkedIn"/>
 </a>
 </p>

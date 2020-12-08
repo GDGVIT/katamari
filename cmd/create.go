@@ -30,7 +30,7 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create [organization name]",
+	Use:   "create [organization's github username]",
 	Short: "Create a new katamari project",
 	Long: `Use this command to create a new project using katamari.
 	
@@ -121,7 +121,7 @@ var createCmd = &cobra.Command{
 
 		utils.Info("config", "Generated katamari config file in project directory")
 		utils.Info("sill", fmt.Sprintf("Created katamari project %s", chalk.Green.Color(args[0])))
-		utils.Info("next", fmt.Sprintf("Update hugo config in %s", chalk.Green.Color(args[0]+"/config.toml")))
+		utils.Info("config", fmt.Sprintf("Configure hugo by editing %s", chalk.Green.Color(args[0]+"/config.toml")))
 	},
 }
 
