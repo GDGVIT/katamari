@@ -19,11 +19,13 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/GDGVIT/katamari/internal/utils"
-	"github.com/spf13/viper"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
+	"golang.org/x/oauth2"
 
 	"github.com/google/go-github/v32/github"
 	"github.com/spf13/cobra"
@@ -35,7 +37,7 @@ var buildCmd = &cobra.Command{
 	Use:   "build",
 	Short: "Build your katamari project",
 	Long:  `Fetch all repos from the specified organization, clone the READMEs and generate static pages ready for hosting!`,
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		org := viper.GetString("site")
 
@@ -52,9 +54,42 @@ var buildCmd = &cobra.Command{
 			utils.Err("enoent", err.Error())
 		}
 
-		client := github.NewClient(nil)
-		repos, _, err := client.Repositories.ListByOrg(context.Background(), org,
-			&github.RepositoryListByOrgOptions{Type: "public"})
+		ctx := context.Background()
+
+		token := os.Getenv("GITHUB_ACCESS_TOKEN")
+
+		var client *github.Client
+
+		if token != "" {
+			ts := oauth2.StaticTokenSource(
+				&oauth2.Token{AccessToken: token},
+			)
+			tc := oauth2.NewClient(ctx, ts)
+			client = github.NewClient(tc)
+		} else {
+			utils.Warn("Access Token Missing", "Set an access token in a .katamari/config.json, else you might be rate limited by GitHub [refer README]")
+			client = github.NewClient(nil)
+		}
+
+		opt := &github.RepositoryListByOrgOptions{
+			Type:        "public",
+			ListOptions: github.ListOptions{PerPage: 50},
+		}
+
+		var allRepos []*github.Repository
+
+		for {
+			repos, resp, err := client.Repositories.ListByOrg(ctx, org, opt)
+			if err != nil {
+				utils.Err("enoent", err.Error())
+			}
+			allRepos = append(allRepos, repos...)
+			if resp.NextPage == 0 {
+				break
+			}
+			opt.Page = resp.NextPage
+		}
+
 		if err != nil {
 			utils.Err("enoent", err.Error())
 			os.Exit(1)
@@ -62,7 +97,7 @@ var buildCmd = &cobra.Command{
 
 		var wg sync.WaitGroup
 
-		for _, repo := range repos {
+		for _, repo := range allRepos {
 			wg.Add(1)
 			utils.Info("sill", fmt.Sprintf("Fetching readme for repo %s", *repo.Name))
 			go func(client *github.Client, repo *github.Repository, wg *sync.WaitGroup) {
@@ -93,10 +128,12 @@ var buildCmd = &cobra.Command{
 				_, _ = f.WriteString(content)
 			}(client, repo, &wg)
 		}
-
 		wg.Wait()
-		utils.Info("sill", fmt.Sprintf("Successfully built your katamari project. %s", chalk.Green.Color("Don't forget to install a hugo theme!")))
+
+		utils.Info("sill", fmt.Sprintf("Fetched %d repos", len(allRepos)))
+		utils.Info("sill", chalk.Green.Color("Successfully built your katamari project!"))
 		utils.Info("sill", fmt.Sprintf("Run %s %s", chalk.Green.Color("hugo server"), chalk.White.Color("to run the hugo server")))
+		utils.Info("sill", fmt.Sprintf("To change theme refer %s", chalk.Green.Color("hugo documentation")))
 	},
 }
 

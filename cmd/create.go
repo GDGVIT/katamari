@@ -18,10 +18,11 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/GDGVIT/katamari/internal/utils"
-	"github.com/spf13/viper"
 	"os"
 	"os/exec"
+
+	"github.com/GDGVIT/katamari/internal/utils"
+	"github.com/spf13/viper"
 
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
@@ -29,7 +30,7 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create [organization name]",
+	Use:   "create [organization's github username]",
 	Short: "Create a new katamari project",
 	Long: `Use this command to create a new project using katamari.
 	
@@ -67,6 +68,51 @@ var createCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		gitPath, err := exec.LookPath("git")
+		if err != nil {
+			utils.Err("notsup", "could not find git! make sure you have git installed, to install a theme.")
+			os.Exit(1)
+		}
+
+		init := exec.Cmd{
+			Path:   gitPath,
+			Stdout: nil,
+			Stderr: os.Stderr,
+			Args:   []string{"", "init"},
+		}
+
+		err = init.Run()
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		addTheme := exec.Cmd{
+			Path:   gitPath,
+			Stdout: nil,
+			Stderr: os.Stderr,
+			Args:   []string{"", "submodule", "add", "https://github.com/colorchestra/smol", "themes/smol"},
+		}
+
+		err = addTheme.Run()
+		if err != nil {
+			utils.Err("fatal", err.Error())
+			os.Exit(1)
+		}
+
+		f, err := os.OpenFile("config.toml", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			utils.Err("fatal", "unable to open config.toml")
+			os.Exit(1)
+		}
+
+		defer f.Close()
+
+		if _, err := f.WriteString(`theme="smol"`); err != nil {
+			utils.Err("fatal", "unable to write to config.toml")
+			os.Exit(1)
+		}
+
 		err = viper.SafeWriteConfigAs(".katamari.toml")
 		if err != nil {
 			utils.Err("fatal", err.Error())
@@ -75,6 +121,7 @@ var createCmd = &cobra.Command{
 
 		utils.Info("config", "Generated katamari config file in project directory")
 		utils.Info("sill", fmt.Sprintf("Created katamari project %s", chalk.Green.Color(args[0])))
+		utils.Info("config", fmt.Sprintf("Configure hugo by editing %s", chalk.Green.Color(args[0]+"/config.toml")))
 	},
 }
 

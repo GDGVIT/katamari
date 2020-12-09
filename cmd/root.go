@@ -52,7 +52,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $PWD/.katamari.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $PWD/.katamari.yaml)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -61,7 +61,7 @@ func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-	} else {	
+	} else {
 		// Find home directory.
 		cwd, err := os.Getwd()
 		if err != nil {

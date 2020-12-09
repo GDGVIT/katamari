@@ -18,3 +18,7 @@ vendor/
 # Editor config files
 .idea
 .vscode
+
+# Binaries folder
+bin/
+config.env
