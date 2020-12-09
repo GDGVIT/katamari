@@ -133,6 +133,7 @@ var buildCmd = &cobra.Command{
 		utils.Info("sill", fmt.Sprintf("Fetched %d repos", len(allRepos)))
 		utils.Info("sill", chalk.Green.Color("Successfully built your katamari project!"))
 		utils.Info("sill", fmt.Sprintf("Run %s %s", chalk.Green.Color("hugo server"), chalk.White.Color("to run the hugo server")))
+		utils.Info("sill", fmt.Sprintf("To change theme refer %s", chalk.Green.Color("hugo documentation")))
 	},
 }
 
