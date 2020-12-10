@@ -41,6 +41,10 @@ go get -u github.com/GDGVIT/katamari
 ```bash
 katamari create <github organization name>
 ```
+or
+```bash
+katamari create -u <your github username>
+```
 
 ## Building the katamari project
 ```bash
