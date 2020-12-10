@@ -30,16 +30,24 @@ import (
 
 // createCmd represents the create command
 var createCmd = &cobra.Command{
-	Use:   "create [organization's github username]",
+	Use:   "create [organization's/user's github username]",
 	Short: "Create a new katamari project",
 	Long: `Use this command to create a new project using katamari.
 	
-	Example: katamari create gdgvit`,
+	Examples:
+	katamari create GDGVIT
+	katamari create -u BRO3886
+	`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.Info("sill", "Initializing a new katamari project...")
 		viper.Set("site", args[0])
-		viper.Set("theme", "ananke")
+		viper.Set("theme", "smol")
+
+		if isUser {
+			utils.Info("sill", fmt.Sprintf("creating katamari project for user %s", chalk.Green.Color(args[0])))
+			viper.Set("isUser", true)
+		}
 
 		hugoPath, err := exec.LookPath("hugo")
 		if err != nil {
@@ -125,6 +133,9 @@ var createCmd = &cobra.Command{
 	},
 }
 
+var isUser bool
+
 func init() {
+	createCmd.Flags().BoolVarP(&isUser, "user", "u", false, "use this flag to aggregate READMEs for a User")
 	rootCmd.AddCommand(createCmd)
 }

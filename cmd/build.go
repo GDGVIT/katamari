@@ -41,6 +41,8 @@ var buildCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		org := viper.GetString("site")
 
+		isUser := viper.GetBool("isuser")
+
 		if org == "" {
 			utils.Err("config", fmt.Sprintf("configuration not found! make sure you have a %s file in the "+
 				"project dir.", chalk.Green.Color(".katamari.toml")))
@@ -67,27 +69,46 @@ var buildCmd = &cobra.Command{
 			tc := oauth2.NewClient(ctx, ts)
 			client = github.NewClient(tc)
 		} else {
-			utils.Warn("Access Token Missing", "Set an access token in a .katamari/config.json, else you might be rate limited by GitHub [refer README]")
+			utils.Warn("config", "Access Token Missing. Set an access token in a .katamari/config.json, else you might be rate limited by GitHub [refer README]")
 			client = github.NewClient(nil)
 		}
 
-		opt := &github.RepositoryListByOrgOptions{
+		orgOpt := &github.RepositoryListByOrgOptions{
+			Type:        "public",
+			ListOptions: github.ListOptions{PerPage: 50},
+		}
+
+		usrOpt := &github.RepositoryListOptions{
 			Type:        "public",
 			ListOptions: github.ListOptions{PerPage: 50},
 		}
 
 		var allRepos []*github.Repository
 
-		for {
-			repos, resp, err := client.Repositories.ListByOrg(ctx, org, opt)
-			if err != nil {
-				utils.Err("enoent", err.Error())
+		if isUser {
+			for {
+				repos, resp, err := client.Repositories.List(ctx, org, usrOpt)
+				if err != nil {
+					utils.Err("enoent", err.Error())
+				}
+				allRepos = append(allRepos, repos...)
+				if resp.NextPage == 0 {
+					break
+				}
+				usrOpt.Page = resp.NextPage
 			}
-			allRepos = append(allRepos, repos...)
-			if resp.NextPage == 0 {
-				break
+		} else {
+			for {
+				repos, resp, err := client.Repositories.ListByOrg(ctx, org, orgOpt)
+				if err != nil {
+					utils.Err("enoent", err.Error())
+				}
+				allRepos = append(allRepos, repos...)
+				if resp.NextPage == 0 {
+					break
+				}
+				orgOpt.Page = resp.NextPage
 			}
-			opt.Page = resp.NextPage
 		}
 
 		if err != nil {
