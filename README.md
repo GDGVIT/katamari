@@ -36,6 +36,8 @@ This package is available as an [AUR](https://aur.archlinux.org/packages/katamar
 go get -u github.com/GDGVIT/katamari
 ```
 
+Alternatively, you can also check out [releases](https://github.com/GDGVIT/katamari/releases/) to get a pre-compiled binary
+
 ## Generating a katamari project
 
 ```bash
