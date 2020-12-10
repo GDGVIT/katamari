@@ -26,12 +26,17 @@ import (
 )
 
 func main() {
+	//Check config is used to check the availability of a config file.
+	//If it does not exist, it creates one at the location where the `katamari`
+	//command is called from.
 	utils.CheckConfig()
+	//include <KATAMARI_INSTALL_DIR>/.katamari/config.json to viper config
 	viper.SetConfigFile(utils.ExecLoc() + "/.katamari/config.json")
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("Error reading config file: %s", err.Error())
 	}
+	//add the access token to env vars
 	os.Setenv("GITHUB_ACCESS_TOKEN", viper.GetString("GITHUB_ACCESS_TOKEN"))
-
+	//start cobra
 	cmd.Execute()
 }

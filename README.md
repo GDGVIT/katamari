@@ -12,6 +12,7 @@
 
 # Functionality
 - [x] Aggregate all your project READMEs into a single static site
+- [x] Support for aggregating User READMEs also
 - [x] Generate the static site using Hugo
 - [x] Default theme set to "Ananke" (needs git)
 - [x] Store GitHub Access Token in config
@@ -39,6 +40,10 @@ go get -u github.com/GDGVIT/katamari
 
 ```bash
 katamari create <github organization name>
+```
+or
+```bash
+katamari create -u <your github username>
 ```
 
 ## Building the katamari project
