@@ -32,6 +32,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:           "katamari <command> <subcommand> [flags]",
 	Short:         "katamari CLI",
+	Version:       "1.0.3",
 	Long:          `Use katamari to aggregate and build static pages for all the READMEs in your organization`,
 	SilenceErrors: true,
 }
