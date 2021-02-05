@@ -12,10 +12,10 @@ all:
 	GOOS=freebsd GOARCH=386 go build -o ./bin/freebsd/katamari
 	GOOS=darwin GOARCH=amd64 go build -o ./bin/mac/katamari
 	@echo "Zipping for release"
-	@tar -czvf bin/releases/katamari_linux.tar.gz bin/linux/katamari LICENSE 
-	@tar -czvf bin/releases/katamari_win.tar.gz bin/windows/katamari.exe LICENSE 
-	@tar -czvf bin/releases/katamari_mac_amd64.tar.gz bin/mac/katamari LICENSE 
-	@tar -czvf bin/releases/katamari_bsd.tar.gz bin/freebsd/katamari LICENSE 
+	@tar -czf bin/releases/katamari_linux.tar.gz LICENSE -C bin/linux katamari
+	@tar -czf bin/releases/katamari_win.tar.gz LICENSE -C  bin/windows katamari.exe
+	@tar -czf bin/releases/katamari_mac_amd64.tar.gz LICENSE -C bin/mac katamari 
+	@tar -czf bin/releases/katamari_bsd.tar.gz LICENSE -C bin/freebsd katamari 
 run:
 	go run .
 global:
@@ -23,4 +23,7 @@ global:
 
 # do not use
 release:
-	gh release create $v ${find /bin/releases -type f -printf "%f "}
+	gh release create $v 'bin/releases/katamari_linux.tar.gz' 'bin/releases/katamari_win.tar.gz' 'bin/releases/katamari_bsd.tar.gz' 'bin/releases/katamari_mac_amd64.tar.gz' 
+
+gdg:
+	gh release create $v 'bin/releases/katamari_linux.tar.gz' 'bin/releases/katamari_win.tar.gz' 'bin/releases/katamari_bsd.tar.gz' 'bin/releases/katamari_mac_amd64.tar.gz' -R GDGVIT/katamari
