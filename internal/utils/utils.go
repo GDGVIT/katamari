@@ -17,6 +17,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -24,6 +26,7 @@ import (
 
 	"github.com/GDGVIT/katamari/internal/styles"
 	"github.com/kardianos/osext"
+	"github.com/spf13/viper"
 	"github.com/ttacon/chalk"
 )
 
@@ -69,9 +72,21 @@ func generateConfig() {
 	`
 	mode := int(0666)
 	folderPath := ExecLoc()
-	err := os.Mkdir(folderPath+"/.katamari", 0700)
+	err := os.Mkdir(folderPath+"/.katamari", os.FileMode(mode))
 	if err != nil {
 		Err("fatal", "unable to create folder: "+err.Error())
 	}
 	ioutil.WriteFile(folderPath+"/.katamari/config.json", []byte(credString), os.FileMode(mode))
+}
+
+//UnsetAndSaveConfig remove key from viper and save as filename
+func UnsetAndSaveConfig(key string, fileName string) error {
+	configMap := viper.AllSettings()
+	delete(configMap, key)
+	encodedConfig, _ := json.MarshalIndent(configMap, "", " ")
+	err := viper.ReadConfig(bytes.NewReader(encodedConfig))
+	if err != nil {
+		return err
+	}
+	return viper.SafeWriteConfigAs(".katamari.toml")
 }

@@ -121,7 +121,7 @@ var createCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		err = viper.SafeWriteConfigAs(".katamari.toml")
+		err = utils.UnsetAndSaveConfig("github_access_token",".katamari.toml")
 		if err != nil {
 			utils.Err("fatal", err.Error())
 			os.Exit(1)
