@@ -72,7 +72,7 @@ func generateConfig() {
 	`
 	mode := int(0666)
 	folderPath := ExecLoc()
-	err := os.Mkdir(folderPath+"/.katamari", os.FileMode(mode))
+	err := os.Mkdir(folderPath+"/.katamari", os.FileMode(0777))
 	if err != nil {
 		Err("fatal", "unable to create folder: "+err.Error())
 	}
