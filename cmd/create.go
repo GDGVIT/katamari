@@ -42,7 +42,7 @@ var createCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		utils.Info("sill", "Initializing a new katamari project...")
 		viper.Set("site", args[0])
-		viper.Set("theme", "smol")
+		viper.Set("theme", "Papermod")
 
 		if isUser {
 			utils.Info("sill", fmt.Sprintf("creating katamari project for user %s", chalk.Green.Color(args[0])))
@@ -99,7 +99,7 @@ var createCmd = &cobra.Command{
 			Path:   gitPath,
 			Stdout: nil,
 			Stderr: os.Stderr,
-			Args:   []string{"", "submodule", "add", "https://github.com/colorchestra/smol", "themes/smol"},
+			Args:   []string{"", "submodule", "add", "https://github.com/adityatelange/hugo-PaperMod", "themes/Papermod", "--depth=1", "--branch v5.0"},
 		}
 
 		err = addTheme.Run()
@@ -116,12 +116,20 @@ var createCmd = &cobra.Command{
 
 		defer f.Close()
 
-		if _, err := f.WriteString(`theme="smol"`); err != nil {
+		if _, err := f.WriteString(`
+theme="Papermod"
+# to render images
+[markup.goldmark.renderer]
+	unsafe=true
+# title, content for papermod theme
+[params.homeInfoParams]
+	Title = "My Projects"
+	Content = "Generated using katamari"`); err != nil {
 			utils.Err("fatal", "unable to write to config.toml")
 			os.Exit(1)
 		}
 
-		err = utils.UnsetAndSaveConfig("github_access_token",".katamari.toml")
+		err = utils.UnsetAndSaveConfig("github_access_token", ".katamari.toml")
 		if err != nil {
 			utils.Err("fatal", err.Error())
 			os.Exit(1)
